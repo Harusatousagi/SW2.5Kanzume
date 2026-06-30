@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>参加申請作成ツール</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+    label { display: block; margin: 15px 0 8px; font-weight: bold; }
+    input { width: 100%; padding: 10px; box-sizing: border-box; font-size: 16px; }
+
+    .supplements {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .sup-btn {
+      padding: 12px 10px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background: #f8f8f8;
+      font-size: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .sup-btn.active {
+      background: #28a745;
+      color: white;
+      border-color: #218838;
+      transform: scale(1.05);
+    }
+
+    button { 
+      padding: 12px 20px; 
+      margin: 15px 8px 15px 0; 
+      font-size: 17px; 
+    }
+    .copy-btn { background: #28a745; color: white; }
+
+    #result { 
+      background: #f0f8ff; 
+      padding: 20px; 
+      border: 2px solid #4682b4; 
+      border-radius: 8px; 
+      white-space: pre-wrap; 
+      font-size: 17px; 
+      line-height: 1.8;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>参加申請作成ツール</h1>
+
+  <label>PC名</label>
+  <input type="text" id="pcname" placeholder="例: フェルディナント・シュナイダー">
+
+  <label>技能</label>
+  <input type="text" id="skill" placeholder="例: ファイター2/レンジャー1/エンハンサー1">
+
+  <label>キャラシURL</label>
+  <input type="text" id="url" placeholder="https://...">
+
+  <label>所持サプリメント（タップで選択・解除）</label>
+  <div class="supplements" id="supplement-list"></div>
+
+  <button onclick="generateText()">完了</button>
+  <button class="copy-btn" onclick="copyToClipboard()">コピーする</button>
+
+  <h2>完成</h2>
+  <div id="result">ここに結果が表示されます</div>
+
+  <script>
+    const supplementsData = [
+      { name: "エピックトレジャリー", abbr: "ET" },
+      { name: "モンストラスロア", abbr: "ML" },
+      { name: "メイガスアーツ", abbr: "MA" },
+      { name: "バトルマスタリー", abbr: "BM" },
+      { name: "アーケインレリック", abbr: "AR" },
+      { name: "アビスブレイカー", abbr: "AB" },
+      { name: "タイラントクリプト", abbr: "TC" },
+      { name: "ブルライト博物誌", abbr: "BL" },
+      { name: "ドーデン博物誌", abbr: "DD" },
+      { name: "ウルシラ博物誌", abbr: "US" },
+      { name: "アウトロープロファイルブック", abbr: "OPB" },
+      { name: "アルフレイム見聞録", abbr: "TA" },
+      { name: "星座の町サイレックオード", abbr: "CO" },
+      { name: "魔導の学府ユーシズ", abbr: "ES" },
+      { name: "ヴァイスシティ", abbr: "VC" },
+      { name: "デモンズライン", abbr: "DL" },
+      { name: "グリフォンロード", abbr: "GR" },
+      { name: "冒険者たちの幻獣戦線", abbr: "BG" },
+      { name: "剣と荒野と冒険者", abbr: "BIG" },
+      { name: "剣と荒野と冒険者2", abbr: "BIG2" },
+      { name: "バルバロスサーガ", abbr: "BS" },
+      { name: "ラクシアライフ", abbr: "RL" }
+      // ここにサプリメントを追加
+    ];
+
+    const container = document.getElementById('supplement-list');
+
+    supplementsData.forEach(item => {
+      const btn = document.createElement('div');
+      btn.className = 'sup-btn';
+      btn.textContent = `${item.name} (${item.abbr})`;
+      btn.dataset.abbr = item.abbr;
+
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+      });
+
+      container.appendChild(btn);
+    });
+
+    function generateText() {
+      const pcname = document.getElementById('pcname').value.trim() || "---";
+      const skill = document.getElementById('skill').value.trim() || "---";
+      const url = document.getElementById('url').value.trim() || "---";
+
+      const checked = Array.from(document.querySelectorAll('.sup-btn.active'))
+                         .map(btn => btn.dataset.abbr);
+      
+      const sup = checked.length ? checked.join('/') : "---";
+
+      // 改行バージョン
+      const result = `PC名【${pcname}】
+技能【${skill}】
+キャラシURL【${url}】
+所持サプリ【${sup}】`;
+
+      document.getElementById('result').textContent = result;
+    }
+
+    function copyToClipboard() {
+      const text = document.getElementById('result').textContent;
+      if (text.includes("ここに結果")) {
+        alert("先に「完了」を押してください");
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => alert("コピーしました！"));
+    }
+  </script>
+</body>
+</html>
